@@ -3,23 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- iOS Meta Tags -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="StopwatchGPT">
-
-  <!-- Android Meta Tags -->
-  <meta name="theme-color" content="#000000">
-  <meta name="mobile-web-app-capable" content="yes">
-
-  <!-- Icons for Android and iOS -->
+  <title>StopwatchGPT</title>
   <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/8671/8671450.png" type="image/png">
-  
-  <title>Rowan's Stopwatch</title>
-  
   <style>
-    /* Body style */
     body {
       margin: 0;
       display: flex;
@@ -30,190 +16,260 @@
       background-size: cover;
       font-family: monospace;
       color: #fff;
+      position: relative;
     }
 
-    /* Stopwatch style */
-    .stopwatch {
-      background: rgba(30, 30, 30, 0.75); /* Updated opacity */
-      backdrop-filter: blur(20px); /* Increased blur effect */
+    .stopwatch, .alarm-clock, .main-menu {
+      background: rgba(30, 30, 30, 0.8);
+      backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); /* Same shadow */
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
       padding: 40px 60px;
       text-align: center;
-      width: 500px; /* Larger width */
+      width: 500px;
+      display: none; /* Hide sections initially */
+    }
+
+    .stopwatch.active, .alarm-clock.active, .main-menu.active {
+      display: block; /* Show only the active section */
     }
 
     .time {
-      font-size: 5em; /* Larger time display */
+      font-size: 5em;
       font-weight: 500;
-      color: #fff;
-      text-shadow: 0 1px 5px rgba(255, 255, 255, 0.2);
       margin-bottom: 30px;
     }
 
-    .buttons button {
-      background: rgba(85, 85, 85, 0.7); /* Semi-transparent grey buttons */
-      backdrop-filter: blur(10px); /* Blur on buttons */
-      border: none;
-      border-radius: 8px;
-      color: #fff;
-      cursor: pointer;
-      font-size: 1.5em; /* Larger font */
-      margin: 10px;
-      padding: 15px 30px; /* Larger button size */
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Button shadow */
-    }
-
-    .buttons button:hover {
-      background: rgba(119, 119, 119, 0.8); /* Slightly darker on hover */
-    }
-
-    .buttons button:focus {
-      outline: none;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-    }
-
-    .buttons button.start {
-      background: rgba(40, 167, 69, 0.7); /* Semi-transparent green button */
-    }
-
-    .buttons button.start:hover {
-      background: rgba(33, 136, 56, 0.8); /* Darker green on hover */
-    }
-
-    /* Main menu style */
-    .main-menu {
-      background: rgba(30, 30, 30, 0.75); /* Same opacity as stopwatch */
-      backdrop-filter: blur(20px); /* Same blur effect */
-      border-radius: 20px;
-      padding: 40px 60px;
-      text-align: center;
-      display: none;
-    }
-
-    .main-menu h1 {
-      color: #fff;
-      font-size: 3em;
-    }
-
-    /* Positioning and styling of the buttons */
-    .button-container {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
+    .buttons {
       display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      z-index: 10; /* Ensure buttons are above other elements */
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+      margin-top: 20px;
     }
 
-    .main-menu-button, .return-to-stopwatch-button {
-      background: rgba(30, 30, 30, 0.75); /* Same background as stopwatch */
-      backdrop-filter: blur(20px); /* Same blur effect as stopwatch */
+    .buttons button, .alarm-clock-button {
+      background: rgba(85, 85, 85, 0.7);
+      backdrop-filter: blur(10px);
       border: none;
       border-radius: 8px;
       color: #fff;
       cursor: pointer;
       font-size: 1.5em;
       padding: 15px 30px;
-      margin: 10px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); /* Same shadow as stopwatch */
       transition: all 0.2s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     }
 
-    .main-menu-button:hover, .return-to-stopwatch-button:hover {
-      background: rgba(119, 119, 119, 0.8); /* Slightly darker on hover */
+    .buttons button:hover, .alarm-clock-button:hover {
+      background: rgba(119, 119, 119, 0.8);
     }
 
-    .main-menu-button:focus, .return-to-stopwatch-button:focus {
+    .buttons button:focus, .alarm-clock-button:focus {
       outline: none;
       box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
     }
 
-    /* Hidden when on stopwatch */
-    .return-to-stopwatch-button {
-      display: none;
+    .buttons button.start {
+      background: rgba(40, 167, 69, 0.7);
+    }
+
+    .buttons button.start:hover {
+      background: rgba(33, 136, 56, 0.8);
+    }
+
+    .alarm-clock-input {
+      font-size: 2em;
+      padding: 10px;
+      margin-bottom: 20px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .alarm-clock-time {
+      font-size: 3em;
+      font-weight: bold;
+    }
+
+    .main-menu-buttons {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      gap: 20px;
+    }
+
+    .main-menu-buttons button {
+      flex: 1;
+      margin: 5px;
+    }
+
+    /* Style for the blue main menu button */
+    .main-menu-button {
+      background: rgba(0, 123, 255, 0.7); /* Blue color */
+      backdrop-filter: blur(10px); /* Blur similar to the stopwatch */
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      color: #fff;
+      cursor: pointer;
+      font-size: 1.5em;
+      padding: 15px 30px;
+      transition: all 0.2s ease;
+    }
+
+    .main-menu-button:hover {
+      background: rgba(0, 102, 204, 0.8); /* Darker blue on hover */
+    }
+
+    .main-menu-button:focus {
+      outline: none;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+
+    /* Align buttons in a row */
+    .buttons {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      gap: 20px;
     }
 
   </style>
 </head>
 <body>
-  <!-- Stopwatch -->
-  <div class="stopwatch" id="stopwatch">
-    <h1 style="margin: 0; margin-bottom: 20px; font-size: 2em;">Rowan's Stopwatch</h1>
-    <div class="time" id="time">00:00:00</div>
-    <div class="buttons">
-      <button class="start" onclick="start()">Start</button>
-      <button onclick="stop()">Stop</button>
-      <button onclick="reset()">Reset</button>
+
+  <!-- Main Menu -->
+  <div class="main-menu active" id="mainMenu">
+    <h1>StopwatchGPT</h1>
+    <div class="main-menu-buttons">
+      <button class="alarm-clock-button" onclick="showAlarmClock()">Alarm Clock</button>
+      <button class="alarm-clock-button" onclick="showStopwatch()">Stopwatch</button>
     </div>
   </div>
 
-  <!-- Main Menu -->
-  <div class="main-menu" id="mainMenu">
+  <!-- Stopwatch -->
+  <div class="stopwatch" id="stopwatch">
     <h1>StopwatchGPT</h1>
+    <div class="time" id="time">00:00:00</div>
+    <div class="buttons">
+      <button class="start" onclick="startStopwatch()">Start</button>
+      <button onclick="stopStopwatch()">Stop</button>
+      <button onclick="resetStopwatch()">Reset</button>
+      <!-- New Main Menu Button -->
+      <button class="main-menu-button" onclick="showMainMenu()">Main Menu</button>
+    </div>
   </div>
 
-  <!-- Button Container for Main Menu and Return to Stopwatch -->
-  <div class="button-container">
-    <button class="main-menu-button" onclick="showMainMenu()">Main Menu</button>
-    <button class="return-to-stopwatch-button" onclick="returnToStopwatch()">Return to Stopwatch</button>
+  <!-- Alarm Clock -->
+  <div class="alarm-clock" id="alarmClock">
+    <h1>Set Your Alarm</h1>
+    <input type="time" id="alarmSet" class="alarm-clock-input">
+    <div class="buttons">
+      <button onclick="startAlarm()">Start Alarm</button>
+      <button onclick="resetAlarm()">Reset</button>
+      <!-- Main Menu Button placed next to Reset -->
+      <button class="main-menu-button" onclick="showMainMenu()">Main Menu</button>
+    </div>
+    <div id="alarmTime" class="alarm-clock-time">00:00:00</div>
   </div>
 
   <script>
-    let timerInterval;
-    let elapsedTime = 0;
+    // Stopwatch variables
+    let stopwatchInterval;
+    let stopwatchElapsedTime = 0;
 
+    // Alarm variables
+    let alarmInterval;
+    let alarmTargetTime = 0;
+
+    // Format time helper function (now includes hours)
     function formatTime(ms) {
       const totalSeconds = Math.floor(ms / 1000);
-      const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+      const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+      const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
       const seconds = String(totalSeconds % 60).padStart(2, '0');
-      const milliseconds = String(ms % 1000).padStart(3, '0').substring(0, 2);
-      return `${minutes}:${seconds}:${milliseconds}`;
+      return `${hours}:${minutes}:${seconds}`;
     }
 
-    function updateDisplay() {
+    // Stopwatch functions
+    function updateStopwatchDisplay() {
       const timeElement = document.getElementById('time');
-      timeElement.textContent = formatTime(elapsedTime);
+      timeElement.textContent = formatTime(stopwatchElapsedTime);
     }
 
-    function start() {
-      if (timerInterval) return;
-      const startTime = Date.now() - elapsedTime;
-      timerInterval = setInterval(() => {
-        elapsedTime = Date.now() - startTime;
-        updateDisplay();
+    function startStopwatch() {
+      if (stopwatchInterval) return;
+      const startTime = Date.now() - stopwatchElapsedTime;
+      stopwatchInterval = setInterval(() => {
+        stopwatchElapsedTime = Date.now() - startTime;
+        updateStopwatchDisplay();
       }, 10);
     }
 
-    function stop() {
-      clearInterval(timerInterval);
-      timerInterval = null;
+    function stopStopwatch() {
+      clearInterval(stopwatchInterval);
+      stopwatchInterval = null;
     }
 
-    function reset() {
-      stop();
-      elapsedTime = 0;
-      updateDisplay();
+    function resetStopwatch() {
+      stopStopwatch();
+      stopwatchElapsedTime = 0;
+      updateStopwatchDisplay();
     }
 
+    // Alarm functions
+    function updateAlarmDisplay(ms) {
+      const timeElement = document.getElementById('alarmTime');
+      timeElement.textContent = formatTime(ms);
+    }
+
+    function startAlarm() {
+      if (alarmInterval) return;
+
+      const alarmSetTime = document.getElementById('alarmSet').value;
+      const [hours, minutes] = alarmSetTime.split(':').map(Number);
+      alarmTargetTime = Date.now() + (hours * 3600 + minutes * 60) * 1000;
+
+      alarmInterval = setInterval(() => {
+        const currentTime = Date.now();
+        const remainingTime = alarmTargetTime - currentTime;
+
+        if (remainingTime <= 0) {
+          clearInterval(alarmInterval);
+          alarmInterval = null;
+          alert("Time's up!");
+          resetAlarm();
+        } else {
+          updateAlarmDisplay(remainingTime);
+        }
+      }, 1000);  // Update every second
+    }
+
+    function resetAlarm() {
+      clearInterval(alarmInterval);
+      alarmInterval = null;
+      alarmTargetTime = 0;
+      updateAlarmDisplay(0);
+    }
+
+    // Page show functions
     function showMainMenu() {
-      document.getElementById('stopwatch').style.display = 'none';
-      document.getElementById('mainMenu').style.display = 'block';
-      document.querySelector('.main-menu-button').style.display = 'none';
-      document.querySelector('.return-to-stopwatch-button').style.display = 'block';
+      document.getElementById('stopwatch').classList.remove('active');
+      document.getElementById('alarmClock').classList.remove('active');
+      document.getElementById('mainMenu').classList.add('active');
     }
 
-    function returnToStopwatch() {
-      document.getElementById('mainMenu').style.display = 'none';
-      document.getElementById('stopwatch').style.display = 'block';
-      document.querySelector('.return-to-stopwatch-button').style.display = 'none';
-      document.querySelector('.main-menu-button').style.display = 'block';
+    function showStopwatch() {
+      document.getElementById('mainMenu').classList.remove('active');
+      document.getElementById('alarmClock').classList.remove('active');
+      document.getElementById('stopwatch').classList.add('active');
     }
 
-    updateDisplay();
+    function showAlarmClock() {
+      document.getElementById('mainMenu').classList.remove('active');
+      document.getElementById('stopwatch').classList.remove('active');
+      document.getElementById('alarmClock').classList.add('active');
+    }
   </script>
 </body>
 </html>
