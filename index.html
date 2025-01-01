@@ -14,23 +14,25 @@
       height: 100vh;
       background: url('https://pbs.twimg.com/media/E4I-7cAVcAITaq4?format=jpg&name=4096x4096') no-repeat center center;
       background-size: cover;
-      font-family: monospace; /* Changed to monospace */
+      font-family: monospace;
       color: #fff;
+      position: relative;
     }
 
     .stopwatch {
-      background: rgba(30, 30, 30, 0.8); /* Reduced opacity */
-      backdrop-filter: blur(20px); /* Increased blur effect */
+      background: rgba(30, 30, 30, 0.75);
+      backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 20px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
       padding: 40px 60px;
       text-align: center;
-      width: 500px; /* Larger width */
+      width: 500px;
+      position: relative;
     }
 
     .time {
-      font-size: 5em; /* Larger time display */
+      font-size: 5em;
       font-weight: 500;
       color: #fff;
       text-shadow: 0 1px 5px rgba(255, 255, 255, 0.2);
@@ -38,21 +40,21 @@
     }
 
     .buttons button {
-      background: rgba(85, 85, 85, 0.7); /* Semi-transparent grey buttons */
-      backdrop-filter: blur(10px); /* Blur on buttons */
+      background: rgba(85, 85, 85, 0.85);
+      backdrop-filter: blur(10px);
       border: none;
       border-radius: 8px;
       color: #fff;
       cursor: pointer;
-      font-size: 1.5em; /* Larger font */
+      font-size: 1.5em;
       margin: 10px;
-      padding: 15px 30px; /* Larger button size */
+      padding: 15px 30px;
       transition: all 0.2s ease;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Button shadow */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     }
 
     .buttons button:hover {
-      background: rgba(119, 119, 119, 0.8); /* Slightly darker on hover */
+      background: rgba(119, 119, 119, 0.8);
     }
 
     .buttons button:focus {
@@ -61,16 +63,63 @@
     }
 
     .buttons button.start {
-      background: rgba(40, 167, 69, 0.7); /* Semi-transparent green button */
+      background: rgba(40, 167, 69, 0.85);
     }
 
     .buttons button.start:hover {
-      background: rgba(33, 136, 56, 0.8); /* Darker green on hover */
+      background: rgba(33, 136, 56, 0.9);
+    }
+
+    .main-menu {
+      display: none;
+      background: rgba(30, 30, 30, 0.75);
+      backdrop-filter: blur(20px);
+      padding: 40px 60px;
+      text-align: center;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+      width: 500px;
+      position: relative;
+    }
+
+    .main-menu h1 {
+      margin-bottom: 20px;
+      font-size: 2em;
+    }
+
+    /* Position the buttons in the bottom right corner of the screen */
+    .main-menu-button, .return-to-stopwatch-button {
+      position: fixed; /* Fixed position to stay at bottom right */
+      bottom: 20px;
+      right: 20px;
+      background: rgba(30, 30, 30, 0.75); /* Same as stopwatch background */
+      color: #fff;
+      border-radius: 8px;
+      padding: 15px 30px;
+      font-size: 1.5em;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); /* Same shadow as stopwatch */
+      border: none; /* Remove border */
+    }
+
+    .main-menu-button:hover, .return-to-stopwatch-button:hover {
+      background: rgba(33, 33, 33, 0.85); /* Slightly darker grey on hover */
+    }
+
+    .main-menu-button:focus, .return-to-stopwatch-button:focus {
+      outline: none;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+
+    /* Initially hide the return to stopwatch button */
+    .return-to-stopwatch-button {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="stopwatch">
+  <div class="stopwatch" id="stopwatch">
     <h1 style="margin: 0; margin-bottom: 20px; font-size: 2em;">Rowan's Stopwatch</h1>
     <div class="time" id="time">00:00:00</div>
     <div class="buttons">
@@ -79,6 +128,16 @@
       <button onclick="reset()">Reset</button>
     </div>
   </div>
+
+  <div class="main-menu" id="mainMenu">
+    <h1>StopwatchGPT</h1>
+  </div>
+
+  <!-- Main Menu Button (Bottom Right) -->
+  <button class="main-menu-button" onclick="showMainMenu()">Main Menu</button>
+
+  <!-- Return to Stopwatch Button (Bottom Right) -->
+  <button class="return-to-stopwatch-button" onclick="returnToStopwatch()">Return to Stopwatch</button>
 
   <script>
     let timerInterval;
@@ -115,6 +174,20 @@
       stop();
       elapsedTime = 0;
       updateDisplay();
+    }
+
+    function showMainMenu() {
+      document.getElementById('stopwatch').style.display = 'none';
+      document.getElementById('mainMenu').style.display = 'block';
+      document.querySelector('.main-menu-button').style.display = 'none';  // Hide Main Menu button
+      document.querySelector('.return-to-stopwatch-button').style.display = 'block';  // Show Return to Stopwatch button
+    }
+
+    function returnToStopwatch() {
+      document.getElementById('mainMenu').style.display = 'none';
+      document.getElementById('stopwatch').style.display = 'block';
+      document.querySelector('.return-to-stopwatch-button').style.display = 'none';  // Hide Return to Stopwatch button
+      document.querySelector('.main-menu-button').style.display = 'block';  // Show Main Menu button
     }
 
     updateDisplay();
