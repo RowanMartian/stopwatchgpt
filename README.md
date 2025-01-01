@@ -12,7 +12,7 @@ Here is the page URL so you can test it out: [https://rowanmartian.github.io/sto
 
 ### **Alarm**
 
-![Alarm Image](https://i.imgur.com/FTBtfxs.png)
+![Alarm Image](https://imgur.com/a/2DgR612)
 
 **Alarm**  
 Not just a stopwatch but also a fully functioning alarm!
