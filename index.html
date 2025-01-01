@@ -132,7 +132,7 @@
       <button onclick="resetAlarm()">Reset</button>
       <button onclick="showMainMenu()">Main Menu</button>
     </div>
-    <div id="alarmTime" class="alarm-clock-time">00:00</div>
+    <div id="remainingTime" class="alarm-clock-time">00:00</div>
   </div>
 
   <!-- Timer -->
@@ -200,20 +200,25 @@
     function startAlarm() {
       const [hours, minutes] = document.getElementById('alarmSet').value.split(':').map(Number);
       const currentDate = new Date();
-      const targetDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), hours, minutes);
-      alarmTargetTime = targetDate.getTime();
+      alarmTargetTime = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), hours, minutes).getTime();
 
       alarmInterval = setInterval(() => {
-        if (Date.now() >= alarmTargetTime) {
+        const remainingTime = alarmTargetTime - Date.now();
+        if (remainingTime <= 0) {
           clearInterval(alarmInterval);
           timeUpSound.play(); // Play the sound
           alert("Time's up!");
+        } else {
+          const hoursLeft = Math.floor(remainingTime / (1000 * 60 * 60));
+          const minutesLeft = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+          document.getElementById('remainingTime').textContent = `${hoursLeft} hours ${minutesLeft} minutes`;
         }
       }, 1000);
     }
 
     function resetAlarm() {
       clearInterval(alarmInterval);
+      document.getElementById('remainingTime').textContent = "00:00";
       alarmInterval = null;
     }
 
