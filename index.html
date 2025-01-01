@@ -19,7 +19,7 @@
       position: relative;
     }
 
-    .stopwatch, .alarm-clock, .main-menu {
+    .stopwatch, .alarm-clock, .timer, .main-menu {
       background: rgba(30, 30, 30, 0.8);
       backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -28,11 +28,11 @@
       padding: 40px 60px;
       text-align: center;
       width: 500px;
-      display: none; /* Hide sections initially */
+      display: none;
     }
 
-    .stopwatch.active, .alarm-clock.active, .main-menu.active {
-      display: block; /* Show only the active section */
+    .stopwatch.active, .alarm-clock.active, .timer.active, .main-menu.active {
+      display: block;
     }
 
     .time {
@@ -49,7 +49,7 @@
       margin-top: 20px;
     }
 
-    .buttons button, .alarm-clock-button {
+    .buttons button, .alarm-clock-button, .timer-button {
       background: rgba(85, 85, 85, 0.7);
       backdrop-filter: blur(10px);
       border: none;
@@ -62,21 +62,13 @@
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     }
 
-    .buttons button:hover, .alarm-clock-button:hover {
+    .buttons button:hover, .alarm-clock-button:hover, .timer-button:hover {
       background: rgba(119, 119, 119, 0.8);
     }
 
-    .buttons button:focus, .alarm-clock-button:focus {
+    .buttons button:focus, .alarm-clock-button:focus, .timer-button:focus {
       outline: none;
       box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-    }
-
-    .buttons button.start {
-      background: rgba(40, 167, 69, 0.7);
-    }
-
-    .buttons button.start:hover {
-      background: rgba(33, 136, 56, 0.8);
     }
 
     .alarm-clock-input {
@@ -87,7 +79,7 @@
       text-align: center;
     }
 
-    .alarm-clock-time {
+    .alarm-clock-time, .timer-time {
       font-size: 3em;
       font-weight: bold;
     }
@@ -103,40 +95,11 @@
       flex: 1;
       margin: 5px;
     }
-
-    /* Style for the blue main menu button */
-    .main-menu-button {
-      background: rgba(0, 123, 255, 0.7); /* Blue color */
-      backdrop-filter: blur(10px); /* Blur similar to the stopwatch */
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-      color: #fff;
-      cursor: pointer;
-      font-size: 1.5em;
-      padding: 15px 30px;
-      transition: all 0.2s ease;
-    }
-
-    .main-menu-button:hover {
-      background: rgba(0, 102, 204, 0.8); /* Darker blue on hover */
-    }
-
-    .main-menu-button:focus {
-      outline: none;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-    }
-
-    /* Align buttons in a row */
-    .buttons {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-      gap: 20px;
-    }
-
   </style>
 </head>
 <body>
+  <!-- Add the audio element -->
+  <audio id="timeUpSound" src="https://www.dropbox.com/scl/fi/g9kk73nh560rw0msze9kz/zapsplat_emergency_siren_beep_warning_nuclear_meltdown_84854.mp3?rlkey=pb08efajj7agx0qe4zy07ulek&st=uxjdn7xy&dl=1"></audio>
 
   <!-- Main Menu -->
   <div class="main-menu active" id="mainMenu">
@@ -144,6 +107,7 @@
     <div class="main-menu-buttons">
       <button class="alarm-clock-button" onclick="showAlarmClock()">Alarm Clock</button>
       <button class="alarm-clock-button" onclick="showStopwatch()">Stopwatch</button>
+      <button class="timer-button" onclick="showTimer()">Timer</button>
     </div>
   </div>
 
@@ -155,8 +119,7 @@
       <button class="start" onclick="startStopwatch()">Start</button>
       <button onclick="stopStopwatch()">Stop</button>
       <button onclick="resetStopwatch()">Reset</button>
-      <!-- New Main Menu Button -->
-      <button class="main-menu-button" onclick="showMainMenu()">Main Menu</button>
+      <button onclick="showMainMenu()">Main Menu</button>
     </div>
   </div>
 
@@ -167,10 +130,21 @@
     <div class="buttons">
       <button onclick="startAlarm()">Start Alarm</button>
       <button onclick="resetAlarm()">Reset</button>
-      <!-- Main Menu Button placed next to Reset -->
-      <button class="main-menu-button" onclick="showMainMenu()">Main Menu</button>
+      <button onclick="showMainMenu()">Main Menu</button>
     </div>
-    <div id="alarmTime" class="alarm-clock-time">00:00:00</div>
+    <div id="alarmTime" class="alarm-clock-time">00:00</div>
+  </div>
+
+  <!-- Timer -->
+  <div class="timer" id="timer">
+    <h1>Set Your Timer</h1>
+    <input type="number" id="timerSet" class="alarm-clock-input" placeholder="Enter minutes">
+    <div class="buttons">
+      <button onclick="startTimer()">Start Timer</button>
+      <button onclick="resetTimer()">Reset</button>
+      <button onclick="showMainMenu()">Main Menu</button>
+    </div>
+    <div id="timerTime" class="timer-time">00:00</div>
   </div>
 
   <script>
@@ -182,19 +156,24 @@
     let alarmInterval;
     let alarmTargetTime = 0;
 
-    // Format time helper function (now includes hours)
+    // Timer variables
+    let timerInterval;
+    let timerEndTime = 0;
+
+    // Get the audio element
+    const timeUpSound = document.getElementById('timeUpSound');
+
+    // Format time helper function
     function formatTime(ms) {
       const totalSeconds = Math.floor(ms / 1000);
-      const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-      const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+      const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
       const seconds = String(totalSeconds % 60).padStart(2, '0');
-      return `${hours}:${minutes}:${seconds}`;
+      return `${minutes}:${seconds}`;
     }
 
     // Stopwatch functions
     function updateStopwatchDisplay() {
-      const timeElement = document.getElementById('time');
-      timeElement.textContent = formatTime(stopwatchElapsedTime);
+      document.getElementById('time').textContent = formatTime(stopwatchElapsedTime);
     }
 
     function startStopwatch() {
@@ -203,7 +182,7 @@
       stopwatchInterval = setInterval(() => {
         stopwatchElapsedTime = Date.now() - startTime;
         updateStopwatchDisplay();
-      }, 10);
+      }, 100);
     }
 
     function stopStopwatch() {
@@ -218,57 +197,66 @@
     }
 
     // Alarm functions
-    function updateAlarmDisplay(ms) {
-      const timeElement = document.getElementById('alarmTime');
-      timeElement.textContent = formatTime(ms);
-    }
-
     function startAlarm() {
-      if (alarmInterval) return;
-
-      const alarmSetTime = document.getElementById('alarmSet').value;
-      const [hours, minutes] = alarmSetTime.split(':').map(Number);
-      alarmTargetTime = Date.now() + (hours * 3600 + minutes * 60) * 1000;
+      const [hours, minutes] = document.getElementById('alarmSet').value.split(':').map(Number);
+      const currentDate = new Date();
+      const targetDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), hours, minutes);
+      alarmTargetTime = targetDate.getTime();
 
       alarmInterval = setInterval(() => {
-        const currentTime = Date.now();
-        const remainingTime = alarmTargetTime - currentTime;
-
-        if (remainingTime <= 0) {
+        if (Date.now() >= alarmTargetTime) {
           clearInterval(alarmInterval);
-          alarmInterval = null;
+          timeUpSound.play(); // Play the sound
           alert("Time's up!");
-          resetAlarm();
-        } else {
-          updateAlarmDisplay(remainingTime);
         }
-      }, 1000);  // Update every second
+      }, 1000);
     }
 
     function resetAlarm() {
       clearInterval(alarmInterval);
       alarmInterval = null;
-      alarmTargetTime = 0;
-      updateAlarmDisplay(0);
     }
 
-    // Page show functions
+    // Timer functions
+    function startTimer() {
+      const minutes = parseInt(document.getElementById('timerSet').value);
+      timerEndTime = Date.now() + minutes * 60000;
+      timerInterval = setInterval(() => {
+        const remaining = timerEndTime - Date.now();
+        if (remaining <= 0) {
+          clearInterval(timerInterval);
+          timeUpSound.play(); // Play the sound
+          alert("Time's up!");
+        } else {
+          document.getElementById('timerTime').textContent = formatTime(remaining);
+        }
+      }, 1000);
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      document.getElementById('timerTime').textContent = "00:00";
+    }
+
+    // Navigation
     function showMainMenu() {
-      document.getElementById('stopwatch').classList.remove('active');
-      document.getElementById('alarmClock').classList.remove('active');
+      document.querySelectorAll('.stopwatch, .alarm-clock, .timer, .main-menu').forEach(el => el.classList.remove('active'));
       document.getElementById('mainMenu').classList.add('active');
     }
 
     function showStopwatch() {
-      document.getElementById('mainMenu').classList.remove('active');
-      document.getElementById('alarmClock').classList.remove('active');
+      document.querySelectorAll('.stopwatch, .alarm-clock, .timer, .main-menu').forEach(el => el.classList.remove('active'));
       document.getElementById('stopwatch').classList.add('active');
     }
 
     function showAlarmClock() {
-      document.getElementById('mainMenu').classList.remove('active');
-      document.getElementById('stopwatch').classList.remove('active');
+      document.querySelectorAll('.stopwatch, .alarm-clock, .timer, .main-menu').forEach(el => el.classList.remove('active'));
       document.getElementById('alarmClock').classList.add('active');
+    }
+
+    function showTimer() {
+      document.querySelectorAll('.stopwatch, .alarm-clock, .timer, .main-menu').forEach(el => el.classList.remove('active'));
+      document.getElementById('timer').classList.add('active');
     }
   </script>
 </body>
