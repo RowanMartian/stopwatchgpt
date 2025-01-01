@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rowan's Stopwatch</title>
+  <title>StopwatchGPT</title>
   <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/8671/8671450.png" type="image/png">
   <style>
     body {
@@ -14,23 +14,23 @@
       height: 100vh;
       background: url('https://pbs.twimg.com/media/E4I-7cAVcAITaq4?format=jpg&name=4096x4096') no-repeat center center;
       background-size: cover;
-      font-family: monospace; /* Changed to monospace */
+      font-family: monospace;
       color: #fff;
     }
 
     .stopwatch {
-      background: rgba(30, 30, 30, 0.8); /* Reduced opacity */
-      backdrop-filter: blur(20px); /* Increased blur effect */
+      background: rgba(30, 30, 30, 0.8);
+      backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 20px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
       padding: 40px 60px;
       text-align: center;
-      width: 500px; /* Larger width */
+      width: 500px;
     }
 
     .time {
-      font-size: 5em; /* Larger time display */
+      font-size: 5em;
       font-weight: 500;
       color: #fff;
       text-shadow: 0 1px 5px rgba(255, 255, 255, 0.2);
@@ -38,21 +38,21 @@
     }
 
     .buttons button {
-      background: rgba(85, 85, 85, 0.7); /* Semi-transparent grey buttons */
-      backdrop-filter: blur(10px); /* Blur on buttons */
+      background: rgba(85, 85, 85, 0.7);
+      backdrop-filter: blur(10px);
       border: none;
       border-radius: 8px;
       color: #fff;
       cursor: pointer;
-      font-size: 1.5em; /* Larger font */
+      font-size: 1.5em;
       margin: 10px;
-      padding: 15px 30px; /* Larger button size */
+      padding: 15px 30px;
       transition: all 0.2s ease;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Button shadow */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     }
 
     .buttons button:hover {
-      background: rgba(119, 119, 119, 0.8); /* Slightly darker on hover */
+      background: rgba(119, 119, 119, 0.8);
     }
 
     .buttons button:focus {
@@ -60,64 +60,31 @@
       box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
     }
 
-    .buttons button.start {
-      background: rgba(40, 167, 69, 0.7); /* Semi-transparent green button */
+    .menu-button {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.6);
+      color: #333;
+      font-size: 1.5em;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
     }
 
-    .buttons button.start:hover {
-      background: rgba(33, 136, 56, 0.8); /* Darker green on hover */
+    .menu-button:hover {
+      background: rgba(255, 255, 255, 0.8);
     }
   </style>
 </head>
 <body>
   <div class="stopwatch">
-    <h1 style="margin: 0; margin-bottom: 20px; font-size: 2em;">Rowan's Stopwatch</h1>
-    <div class="time" id="time">00:00:00</div>
-    <div class="buttons">
-      <button class="start" onclick="start()">Start</button>
-      <button onclick="stop()">Stop</button>
-      <button onclick="reset()">Reset</button>
-    </div>
+    <h1 style="margin: 0; margin-bottom: 20px; font-size: 2em;">StopwatchGPT</h1>
+    <div class="time" id="time">StopwatchGPT</div>
   </div>
 
-  <script>
-    let timerInterval;
-    let elapsedTime = 0;
-
-    function formatTime(ms) {
-      const totalSeconds = Math.floor(ms / 1000);
-      const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
-      const seconds = String(totalSeconds % 60).padStart(2, '0');
-      const milliseconds = String(ms % 1000).padStart(3, '0').substring(0, 2);
-      return `${minutes}:${seconds}:${milliseconds}`;
-    }
-
-    function updateDisplay() {
-      const timeElement = document.getElementById('time');
-      timeElement.textContent = formatTime(elapsedTime);
-    }
-
-    function start() {
-      if (timerInterval) return;
-      const startTime = Date.now() - elapsedTime;
-      timerInterval = setInterval(() => {
-        elapsedTime = Date.now() - startTime;
-        updateDisplay();
-      }, 10);
-    }
-
-    function stop() {
-      clearInterval(timerInterval);
-      timerInterval = null;
-    }
-
-    function reset() {
-      stop();
-      elapsedTime = 0;
-      updateDisplay();
-    }
-
-    updateDisplay();
-  </script>
+  <button class="menu-button" onclick="window.location.href='index.html'">Main Menu</button>
 </body>
 </html>
